@@ -10,11 +10,23 @@
 
 namespace fs = std::filesystem;
 
+
 int main() {
-   
-    auto hexToBin = [](const std::string& hexValue) {
-        std::bitset<8> bin(std::stoi(hexValue, nullptr, 16));
-        return bin.to_string();
+    //función para convertir valores hex a binario 
+    auto hexToBin = [](const std::string& hexValue, int line_number) {
+        try {
+            
+            std::bitset<8> bin(std::stoi(hexValue, nullptr, 16));
+            return bin.to_string();
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Error en la línea " << line_number << ": La cadena '" << hexValue 
+                      << "' no es un valor hexadecimal válido." << std::endl;
+            return std::string(8, '0');  //cadena de 8 ceros en caso de error
+        } catch (const std::out_of_range& e) {
+            std::cerr << "Error en la línea " << line_number << ": El valor hexadecimal '" << hexValue 
+                      << "' está fuera del rango permitido." << std::endl;
+            return std::string(8, '0');  //cadena de 8 ceros en caso de error
+        }
     };
 
    
@@ -56,7 +68,7 @@ int main() {
                 continue;  // Ya procesamos esta fecha
             }
 
-            // archivos correspondientes a esa fecha
+            //archivos correspondientes a esa fecha
             std::ifstream infile_m101(fecha + "mate-m101.txt");
             std::ifstream infile_m102(fecha + "mate-m102.txt");
             std::ifstream infile_m103(fecha + "mate-m103.txt");
@@ -101,15 +113,8 @@ int main() {
             
 
             
-            // Reiniciar los archivos para comenzar el procesamiento
-            infile_m101.clear();
-            infile_m101.seekg(0);
-            infile_m102.clear();
-            infile_m102.seekg(0);
-            infile_m103.clear();
-            infile_m103.seekg(0);
-
-            // Leer línea por línea los archivos para el procesamiento principal
+            
+            //para leer líneas
             while (std::getline(infile_m101, line_m101) && std::getline(infile_m102, line_m102) && std::getline(infile_m103, line_m103)) {
                 std::stringstream ss_m101(line_m101), ss_m102(line_m102), ss_m103(line_m103);
 
@@ -117,7 +122,7 @@ int main() {
                 std::string BB_m102, BA_m102, AA_m102;
                 std::string BB_m103, BA_m103, AA_m103;
 
-                // Leer línea de m101
+                //líneas m101
                 std::getline(ss_m101, timestamp_m101, ',');
                 std::getline(ss_m101, BB_m101, ',');
                 std::getline(ss_m101, BA_m101, ',');
@@ -125,44 +130,45 @@ int main() {
                 std::getline(ss_m101, timestamp2_m101, ',');
                 std::getline(ss_m101, event_m101, ',');
 
-                // Leer línea de m102
+                //líneas de m102
                 std::getline(ss_m102, temp, ',');  // timestamp2_m102, no se usa
                 std::getline(ss_m102, BB_m102, ',');
                 std::getline(ss_m102, BA_m102, ',');
                 std::getline(ss_m102, AA_m102, ',');
 
-                // Leer línea de m103
+                //leer lineas de m103
                 std::getline(ss_m103, temp, ',');  // timestamp2_m103, no se usa
                 std::getline(ss_m103, BB_m103, ',');
                 std::getline(ss_m103, BA_m103, ',');
                 std::getline(ss_m103, AA_m103, ',');
 
-                // Convertir hexadecimales a binario
-                std::string BB_m101_bin = hexToBin(BB_m101);
-                std::string BA_m101_bin = hexToBin(BA_m101);
-                std::string AA_m101_bin = hexToBin(AA_m101);
+                //hexxadecimal a bin
+                int line_number = __LINE__;
+                std::string BB_m101_bin = hexToBin(BB_m101, line_number);
+                std::string BA_m101_bin =hexToBin(BA_m101, line_number);
+                std::string AA_m101_bin = hexToBin(AA_m101, line_number);
 
-                std::string BB_m102_bin = hexToBin(BB_m102);
-                std::string BA_m102_bin = hexToBin(BA_m102);
-                std::string AA_m102_bin = hexToBin(AA_m102);
+                std::string BB_m102_bin =hexToBin(BB_m102, line_number);
+                std::string BA_m102_bin = hexToBin(BA_m102, line_number);
+                std::string AA_m102_bin = hexToBin(AA_m102, line_number);
 
-                std::string BB_m103_bin = hexToBin(BB_m103);
-                std::string BA_m103_bin = hexToBin(BA_m103);
-                std::string AA_m103_bin = hexToBin(AA_m103);
+                std::string BB_m103_bin = hexToBin(BB_m103, line_number);
+                std::string BA_m103_bin = hexToBin(BA_m103, line_number);
+                std::string AA_m103_bin = hexToBin(AA_m103, line_number);
 
-                // Concatenar B y A para m101
-                std::string B_m101 = BB_m101_bin + BA_m101_bin.substr(0, 4);  // Los primeros 4 bits de BA_m101
-                std::string A_m101 = BA_m101_bin.substr(4, 4) + AA_m101_bin;  // Los últimos 4 bits de BA_m101
+                //Concatenar B y A para m101
+                std::string B_m101 = BB_m101_bin + BA_m101_bin.substr(0, 4);  //los primeros 4 bits de BA_m101
+                std::string A_m101 = BA_m101_bin.substr(4, 4) + AA_m101_bin;  //últimos 4 bits de BA_m101
 
-                // Concatenar B y A para m102
-                std::string B_m102 = BB_m102_bin + BA_m102_bin.substr(0, 4);  // Los primeros 4 bits de BA_m102
-                std::string A_m102 = BA_m102_bin.substr(4, 4) + AA_m102_bin;  // Los últimos 4 bits de BA_m102
+                //concatenar B y A para m102
+                std::string B_m102 = BB_m102_bin + BA_m102_bin.substr(0, 4);  //primeros 4 bits de BA_m102
+                std::string A_m102 = BA_m102_bin.substr(4, 4) + AA_m102_bin;  // últimos 4 bits de BA_m102
 
-                // Concatenar B y A para m103
+                // concatenar B y A para m103
                 std::string B_m103 = BB_m103_bin + BA_m103_bin.substr(0, 4);  // Los primeros 4 bits de BA_m103
                 std::string A_m103 = BA_m103_bin.substr(4, 4) + AA_m103_bin;  // Los últimos 4 bits de BA_m103
 
-                // Convertir B y A de binario a lista de posiciones activadas
+                //convertir B y A de binario a lista de posiciones activadas
                 std::vector<int> positions_B_m101 = binToPositions(B_m101);
                 std::vector<int> positions_A_m101 = binToPositions(A_m101);
 
@@ -188,7 +194,7 @@ int main() {
                 nA3 = (positions_A_m103.empty() || positions_A_m103[0] == 0) ? 0 : positions_A_m103.size();
                 nB3 = (positions_B_m103.empty() || positions_B_m103[0] == 0) ? 0 : positions_B_m103.size();
 
-                //salidaa
+                //salida
                 outfile << timestamp_m101 << ","
                         << B_m101_str << "," << A_m101_str << "," << B_m102_str << "," << A_m102_str << ","
                         << B_m103_str << "," << A_m103_str << "," << event_m101 << "," << timestamp2_m101 << ","
@@ -205,7 +211,7 @@ int main() {
                 A3 = positions_A_m103;
                 B3 = positions_B_m103;
 
-                // Llenar el TTree
+                //llenar tree
                 tree->Fill();
             }
 
@@ -215,13 +221,13 @@ int main() {
             infile_m103.close();
             outfile.close();
 
-            // Guardar el TTree en el archivo ROOT
+            //guardo tree como .root
             rootFile->Write();
             rootFile->Close();
 
             std::cout << "Procesamiento completo para la fecha " << fecha << ". Archivo guardado en " << fecha + "combined_output.txt" << " y " << fecha + "output.root" << std::endl;
            
-            // Añadir fecha a las procesadas
+            //añadir fecha a las procesadas
             fechas_procesadas.push_back(fecha);
         }
     }
@@ -229,4 +235,3 @@ int main() {
     return 0;
 }
 
-main();  // Ejecutar la función main
