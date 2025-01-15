@@ -7,12 +7,19 @@ TFile *file = TFile::Open("2024_09_11_06h00_output.root");
 TTree *tree = (TTree*)file->Get("tree");
 //PRINT
 tree->Print();
-//PARA VER COMO TABLA, PARA COLUMNAS VECTORES SOLO SE MUESTRA EL PRIMER ELEMENTO
-tree->Scan("ts:A1:B1:A2:B2:A3:B3:nA1:nB1:nA2:nB2:nA3:nB3:ts2:evt:")
+
+//MÉTODO SCAN NO FUNCIONA BIEN CON BRANCHES VECTORIALES, SE DEBE SCANEAR UN ELEMENTO REPRESENTATIVO DEL VECTOR 
+tree->Scan("ts:A1[0]:B1[0]:A2[0]:B2[0]:A3[0]:B3[0]:nA1:nB1:nA2:nB2:nA3:nB3:ts2:evt:")
+//PARA VER TODOS LOS ELEMENTOS DEL VECTOR
+ tree->Scan("A1[0]:A1[1]:A1[2]:A1[3]:A1[4]:A1[5]:A1[6]:A1[7]:A1[8]:A1[9]:A1[10]:A1[11]");
+//PARA SCANEAR CON EL FILTRO ACTIVO, NOTAR COMO LOS EVENTOS SE SALTAN CUANDO CORRESPONDE.
+tree->Scan("ts:A1[0]:B1[0]:A2[0]:B2[0]:A3[0]:B3[0]:nA1:nB1:nA2:nB2:nA3:nB3:ts2:evt:","nA1 == 1 && nB1 == 1 && nA2 == 1 && nB2 == 1 && nA3 == 1 && nB3 == 1")
+
+
 //CREAR HISTOGRAMA TH2D
 TH2D *histo = new TH2D("histo", "Histograma B vs A;A;B", 12, 1, 13, 12, 1, 13);
 //HACER HISTOGRAMA EXCLUYENDO DATOS
-tree->Draw("A2:B2 >> histograma", "nA1 == 1 && nB1 == 1 && nA2 == 1 && nB2 && nA3 == 1 && nB3 ", "COLZ");
+tree->Draw("A2:B2 >> histograma", "nA1 == 1 && nB1 == 1 && nA2 == 1 && nB2 == 1 && nA3 == 1 && nB3 == 1 ", "COLZ");
 //PARA VER TODOS LOS ELEMENTOS DEL VECTOR
  tree->Scan("A1[0]:A1[1]:A1[2]:A1[3]:A1[4]:A1[5]:A1[6]:A1[7]:A1[8]:A1[9]:A1[10]:A1[11]");
 
