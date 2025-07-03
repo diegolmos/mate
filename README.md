@@ -118,7 +118,6 @@ En este flujo:
 2. permitir también concatenar archivos .csv
 3. Incluir branch de theta_x junto a theta_y
 4. Crear módulo que permita hacer el fitting de rate vs. ángulo
-5. Corregir errores estadisticos de rate vs delta T
-6. Implementación en QT creator
-7. Optimizar validación de fechas
+5. Implementación en QT creator
+6. Optimizar validación de fechas
 
